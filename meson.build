@@ -102,6 +102,7 @@ unpacked_objects = custom_target(
         'x',
         '@INPUT@'
     ],
+    install: false,
 )
 
 patched_relocations = custom_target(
@@ -109,17 +110,20 @@ patched_relocations = custom_target(
     input: unpacked_objects,
     output: patched_object_files,
     command: [
-        python, meson.project_source_root() / 'scripts/patch_relocations.py',
-        meson.current_build_dir(),
-        '@INPUT@',
+        python,
+        meson.project_source_root() / 'scripts' / 'patch_relocations.py',
+        meson.global_build_root(),  # Where ar extracted the .obj files
+        '@OUTDIR@',                  # Where patched .o files should go
+        '@INPUT@',                   # The extracted .obj files
     ],
+    install: false,
 )
 
 shiggy_dep = declare_dependency(
     link_with: static_library(
         'shiggy',
         meson.project_source_root() / 'src' / 'shims.c',
-        include_directories : include_directories('include'),
+        include_directories: include_directories('include'),
         objects: patched_relocations,
     )
 )

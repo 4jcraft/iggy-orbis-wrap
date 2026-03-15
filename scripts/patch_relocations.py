@@ -1,9 +1,10 @@
 import sys, struct, shutil, os
 
-def patch_relocs(build_dir, object_files):
+def patch_relocs(build_dir, out_dir, object_files):
     patched = 0
     for f in object_files:
-        outfile = os.path.join(build_dir, os.path.basename(f).replace('.obj', '.o'))
+        f = os.path.join(build_dir, os.path.basename(f))
+        outfile = os.path.join(out_dir, os.path.basename(f).replace('.obj', '.o'))
         shutil.copy(f, outfile)
         
         with open(outfile, 'rb+') as file:
@@ -36,6 +37,7 @@ def patch_relocs(build_dir, object_files):
 
 if __name__ == '__main__':
     build_dir = sys.argv[1]
-    object_files = sys.argv[2:]
+    out_dir = sys.argv[2]
+    object_files = sys.argv[3:]
 
-    patch_relocs(build_dir, object_files)
+    patch_relocs(build_dir, out_dir, object_files)
