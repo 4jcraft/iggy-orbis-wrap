@@ -100,7 +100,9 @@ unpacked_objects = custom_target(
     command: [
         ar,
         'x',
-        '@INPUT@'
+        '@INPUT@',
+        '--output',
+        meson.project_build_root()
     ],
 )
 
