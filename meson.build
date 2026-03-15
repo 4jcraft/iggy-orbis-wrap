@@ -1,5 +1,6 @@
 project('shiggy', 'c',
     version: '1.0',
+    meson_version: '>= 1.1.0'
 )
 
 pymod = import('python')
@@ -87,18 +88,12 @@ iggy_object_files = [
     'zlib.obj',
 ]
 
-object_file_paths = []
-foreach file : iggy_object_files
-  object_file_paths += meson.current_build_dir() / file
-endforeach
-
 patched_object_files = []
 foreach file : iggy_object_files
     patched_object_files += file.replace('.obj', '.o')
 endforeach
 
-
-unpack = custom_target(
+unpacked_objects = custom_target(
     'unpack-archive',
     input: meson.project_source_root() / 'libs' / 'libiggy_orbis.a',
     output: iggy_object_files,
@@ -109,27 +104,18 @@ unpack = custom_target(
     ],
 )
 
-patch_relocations = custom_target(
+patched_relocations = custom_target(
     'patch-relocations',
-    input: object_file_paths,
+    input: unpacked_objects,
     output: patched_object_files,
     command: [
         python, meson.project_source_root() / 'scripts/patch_relocations.py',
+        '@INPUT@',
     ],
 )
 
 libshiggy = static_library(
     'shiggy',
     meson.project_source_root() / 'src' / 'shims.c',
-)
-
-custom_target(
-    'add-patched-objects',
-    input: [patch_relocations, libshiggy],
-    output: 'libshiggy.stamp',
-    command: [
-        ar,
-        'r',
-    ] + [libshiggy.full_path()] + patched_object_files + ['&&', 'touch', '@OUTPUT@'],
-    build_by_default: true,
+    objects: patched_relocations,
 )

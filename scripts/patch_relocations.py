@@ -1,8 +1,8 @@
-import sys, struct, glob, shutil
+import sys, struct, shutil
 
-def patch_relocs():
+def patch_relocs(object_files):
     patched = 0
-    for f in glob.glob("*.obj"):
+    for f in object_files:
         outfile = f.replace('.obj', '.o')
         shutil.copy(f, outfile)
         
@@ -35,4 +35,4 @@ def patch_relocs():
     print(f"Patched {patched} 'type 40' relocations to standard GOTPCREL (9).")
 
 if __name__ == '__main__':
-    patch_relocs()
+    patch_relocs(sys.argv[1:])
