@@ -114,8 +114,7 @@ patched_relocations = custom_target(
     ],
 )
 
-shiggy = declare_dependency(
-    fallback: 'shiggy_dep',
+shiggy_dep = declare_dependency(
     link_with: static_library(
         'shiggy',
         meson.project_source_root() / 'src' / 'shims.c',
