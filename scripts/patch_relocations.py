@@ -1,9 +1,9 @@
-import sys, struct, shutil
+import sys, struct, shutil, os
 
-def patch_relocs(object_files):
+def patch_relocs(build_dir, object_files):
     patched = 0
     for f in object_files:
-        outfile = f.replace('.obj', '.o')
+        outfile = os.path.join(build_dir, os.path.basename(f).replace('.obj', '.o'))
         shutil.copy(f, outfile)
         
         with open(outfile, 'rb+') as file:
@@ -35,4 +35,7 @@ def patch_relocs(object_files):
     print(f"Patched {patched} 'type 40' relocations to standard GOTPCREL (9).")
 
 if __name__ == '__main__':
-    patch_relocs(sys.argv[1:])
+    build_dir = sys.argv[1]
+    object_files = sys.argv[2:]
+
+    patch_relocs(build_dir, object_files)

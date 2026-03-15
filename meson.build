@@ -110,6 +110,7 @@ patched_relocations = custom_target(
     output: patched_object_files,
     command: [
         python, meson.project_source_root() / 'scripts/patch_relocations.py',
+        meson.current_build_dir(),
         '@INPUT@',
     ],
 )
